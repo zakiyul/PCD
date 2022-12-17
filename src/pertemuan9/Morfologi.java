@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pertemuan8;
+package pertemuan9;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -26,14 +26,14 @@ import org.jfree.data.category.DefaultCategoryDataset;
  *
  * @author zaki
  */
-public class Thresholding extends javax.swing.JFrame {
+public class Morfologi extends javax.swing.JFrame {
 
     String sumber;
 
     /**
      * Creates new form NewJFrame
      */
-    public Thresholding() {
+    public Morfologi() {
         initComponents();
     }
 
@@ -333,6 +333,73 @@ public class Thresholding extends javax.swing.JFrame {
         return prosesGambar;
     }
     
+    public BufferedImage dilasi(String sumber) {
+        BufferedImage prosesGambar;
+        BufferedImage loadIng = loadImage(sumber);
+        int ukuranX = loadIng.getWidth();
+        int ukuranY = loadIng.getHeight();
+        prosesGambar = new BufferedImage(ukuranX, ukuranY,
+                BufferedImage.TYPE_BYTE_GRAY);
+        Graphics g = prosesGambar.getGraphics();
+        g.drawImage(loadIng, 0, 0, null);
+        WritableRaster raster = prosesGambar.getRaster();
+        for (int x = 1; x < (ukuranX - 1); x++) {
+            for (int y = 1; y < (ukuranY - 1); y++) {
+                int rgb22 = loadIng.getRGB(x, y);
+                int p1 = (rgb22 >> 8) & 0xff;
+                if (p1 == 0) {
+                    raster.setSample(x - 1, y - 1, 0, 0);
+                    raster.setSample(x, y - 1, 0, 0);
+                    raster.setSample(x + 1, y - 1, 0, 0);
+                    raster.setSample(x - 1, y, 0, 0);
+                    raster.setSample(x + 1, y, 0, 0);
+                    raster.setSample(x - 1, y + 1, 0, 0);
+                    raster.setSample(x, y + 1, 0, 0);
+                    raster.setSample(x + 1, y + 1, 0, 0);
+                }
+            }
+        }
+        return prosesGambar;
+    }
+    
+     public BufferedImage erosi(String sumber) {
+        BufferedImage prosesGambar;
+        BufferedImage loadIng = loadImage(sumber);
+        int ukuranX = loadIng.getWidth();
+        int ukuranY = loadIng.getHeight();
+        prosesGambar = new BufferedImage(ukuranX, ukuranY,
+                BufferedImage.TYPE_BYTE_GRAY);
+        Graphics g = prosesGambar.getGraphics();
+        g.drawImage(loadIng, 0, 0, null);
+        WritableRaster raster = prosesGambar.getRaster();
+        for (int x = 1; x < (ukuranX - 1); x++) {
+            for (int y = 1; y < (ukuranY - 1); y++) {
+                int rgb11 = loadIng.getRGB((x - 1), (y - 1));
+                int p9 = (rgb11 >> 8) & 0xff;
+                int rgb12 = loadIng.getRGB(x, (y - 1));
+                int p2 = (rgb12 >> 8) & 0xff;
+                int rgb13 = loadIng.getRGB((x + 1), (y - 1));
+                int p3 = (rgb13 >> 8) & 0xff;
+                int rgb21 = loadIng.getRGB((x - 1), (y));
+                int p8 = (rgb21 >> 8) & 0xff;
+                int rgb22 = loadIng.getRGB(x, y);
+                int p1 = (rgb22 >> 8) & 0xff;
+                int rgb23 = loadIng.getRGB((x + 1), y);
+                int p4 = (rgb23 >> 8) & 0xff;
+                int rgb31 = loadIng.getRGB((x - 1), (y + 1));
+                int p7 = (rgb31 >> 8) & 0xff;
+                int rgb32 = loadIng.getRGB(x, (y + 1));
+                int p6 = (rgb32 >> 8) & 0xff;
+                int rgb33 = loadIng.getRGB((x + 1), (y + 1));
+                int p5 = (rgb33 >> 8) & 0xff;
+                if ((p2 != 0) | (p3 != 0) | (p4 != 0) | (p5 != 0)
+                        | (p6 != 0) | (p7 != 0) | (p8 != 0) | (p9 != 0)) {
+                    raster.setSample(x, y, 0, 255);
+                }
+            }
+        }
+        return prosesGambar;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -362,6 +429,9 @@ public class Thresholding extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         deteksiTepiActionPerform = new javax.swing.JMenuItem();
         thresholdingMenuItem = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -482,6 +552,26 @@ public class Thresholding extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu3);
 
+        jMenu4.setText("Morfologi");
+
+        jMenuItem3.setText("Dilasi");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem3);
+
+        jMenuItem4.setText("Erosi");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem4);
+
+        jMenuBar1.add(jMenu4);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -600,6 +690,26 @@ public class Thresholding extends javax.swing.JFrame {
         tampil_output.setIcon(imageIcon);
     }//GEN-LAST:event_thresholdingMenuItemActionPerformed
 
+    //Dilasi
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        BufferedImage grayscale = dilasi(sumber);
+        int x = tampil_output.getWidth();
+        int y = tampil_output.getHeight();
+        ImageIcon imageIcon = new ImageIcon(resize(grayscale, x, y));
+        tampil_output.setIcon(imageIcon);
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    //Erosi
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        BufferedImage grayscale = erosi(sumber);
+        int x = tampil_output.getWidth();
+        int y = tampil_output.getHeight();
+        ImageIcon imageIcon = new ImageIcon(resize(grayscale, x, y));
+        tampil_output.setIcon(imageIcon);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -617,14 +727,46 @@ public class Thresholding extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Thresholding.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Morfologi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Thresholding.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Morfologi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Thresholding.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Morfologi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Thresholding.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Morfologi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -661,7 +803,7 @@ public class Thresholding extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Thresholding().setVisible(true);
+                new Morfologi().setVisible(true);
             }
         });
     }
@@ -676,9 +818,12 @@ public class Thresholding extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollBar scrollBarBrightness;
